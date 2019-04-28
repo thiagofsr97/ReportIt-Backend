@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 import thumbnailPluginLib from 'mongoose-thumbnail';
 import path from 'path';
+
 const { thumbnailPlugin, make_upload_to_model } = thumbnailPluginLib;
 
 const uploadsBase = path.join(__dirname, `${process.env.PATH_UPLOAD}`);
@@ -34,10 +35,11 @@ userSchema.plugin(thumbnailPlugin, {
 // encrypt password before save
 userSchema.pre('save', function (next) {
   const user = this;
-  if (!user.isModified || !user.isNew) { // don't rehash if it's an old user
+  console.log(user.isModified());
+  if (!user.isModified()) { // don't rehash if it's an old user
     next();
   } else {
-    bcrypt.hash(user.password, process.env.SALTING_ROUNDS, (err, hash) => {
+    bcrypt.hash(user.password, parseInt(`${process.env.SALTING_ROUNDS}`, 10), (err, hash) => {
       if (err) {
         console.log('Error hashing password for user', user.name);
         next(err);

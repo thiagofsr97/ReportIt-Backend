@@ -18,6 +18,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import env from './config/enviroments/enviroment';
+import usersRoute from './routes/users';
 
 dotenv.config({ path: env() });
 
@@ -35,6 +36,7 @@ app.use(cookieParser());
  * Setting up routes
  */
 
+app.use('/users', usersRoute);
 
 /**
   * Used when next is called with no parameters

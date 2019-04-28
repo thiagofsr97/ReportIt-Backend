@@ -1,7 +1,7 @@
-import { validationResult } from 'express-validator';
+import { validationResult } from 'express-validator/check';
 import createError from 'http-errors';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import { validateToken, destroyJwt, signIn } from '../helpers/jwtAuth';
 import User from '../models/user';
 
 
@@ -15,17 +15,19 @@ const authenticate = async function (req, res, next) {
     const { username, password } = req.body;
     const result = {};
 
-    const user = await User.findOne({ username }).select('-password').exec();
+    const user = await User.findOne({ username });
     if (!user) {
       return next(createError(404), 'User not found.');
     }
 
+    console.log(user);
     const match = await bcrypt.compare(password, user.password);
     if (match) {
-      const payload = { user: user.name };
-      const options = { expiresIn: '1d' };
-      const secret = process.env.SECRET;
-      const token = jwt.sign(payload, secret, options);
+      const payload = {
+        user: user.username,
+        id: user._id,
+      };
+      const token = await signIn(payload);
 
       result.token = token;
       result.result = user;
@@ -108,7 +110,7 @@ const update = async function (req, res, next) {
 
   try {
     const result = {};
-    const { id } = req.params.id;
+    const { id } = req.params;
     const updateObj = {};
 
     const user = await User.findById(id);
@@ -116,17 +118,28 @@ const update = async function (req, res, next) {
       return next(createError(404, 'User not found.'));
     }
 
-    Object.keys(user).forEach((key) => {
+
+    Object.keys(user._doc).forEach((key) => {
       if (key !== '_id' && req.body[key] !== undefined) {
         updateObj[key] = req.body[key];
       }
     });
     if (updateObj.dateBirth !== undefined) {
-        updateObj.dateBirth = new Date(updateObj.dateBirth);
+      updateObj.dateBirth = new Date(updateObj.dateBirth);
+    }
+
+    const { username } = updateObj;
+    if (username !== undefined) {
+      const exists = await User.findOne({ username });
+
+      if (exists && (exists._id !== id)) {
+        return next(createError(403, `Username ${username} has already been taken.`));
+      }
     }
 
     Object.assign(user, updateObj);
     const userSaved = await user.save();
+    destroyJwt(id);
     result.result = userSaved;
     res.status(200).send(result);
   } catch (err) {
@@ -146,6 +159,19 @@ const exclude = async function (req, res, next) {
   }
 };
 
+const logout = async function (req, res, next) {
+  try {
+    const result = {};
+    const { id } = req.params;
+    await destroyJwt(id);
+    result.id = id;
+    result.result = `User of id ${id} has succefully been logged out.`;
+    res.status(200).send(result);
+  } catch (err) {
+    return next(createError(403, `Error logging out user of id ${id}. Might have already been logged out before or doesn't exit.`));
+  }
+};
+
 export {
-  authenticate, getAll, getById, create, update, exclude,
+  authenticate, getAll, getById, create, update, exclude, logout,
 };
