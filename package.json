@@ -1,0 +1,38 @@
+{
+  "name": "BackEnd",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "DEBUG=reportIt:* NODE_ENV=production babel-node ./bin/www",
+    "dev": "nodemon --exec DEBUG=reportIt:* NODE_ENV=dev babel-node ./bin/www"
+  },
+  "dependencies": {
+    "amqplib": "^0.5.3",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "bcrypt": "^3.0.6",
+    "cookie-parser": "~1.4.3",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^7.0.0",
+    "express": "~4.16.0",
+    "express-validator": "^5.3.1",
+    "fs-extra": "^7.0.1",
+    "helmet": "^3.16.0",
+    "http-errors": "^1.7.2",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
+    "mongoose": "^5.4.22",
+    "mongoose-thumbnail": "0.0.1",
+    "morgan": "~1.9.0",
+    "multer": "^1.4.1",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.2",
+    "nodemon": "^1.18.10"
+  }
+}
