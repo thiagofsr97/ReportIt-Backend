@@ -2,11 +2,12 @@
 import Redis from 'ioredis';
 import createError from 'http-errors';
 import JWTR from 'jwt-redis';
+import env from '../config/enviroments/enviroment';
 
 const redis = new Redis();
 const jwt = new JWTR(redis);
 
-const SECRET = `${process.env.SECRET}`;
+const SECRET = `${env.SECRET}`;
 
 const options = {
   expiresIn: '1d',

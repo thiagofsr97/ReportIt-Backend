@@ -8,10 +8,17 @@ import debug from 'debug';
 import http from 'http';
 import app from '../app';
 import db from '../db';
+import env from '../config/enviroments/enviroment';
+
+
+// import env from '../config/enviroments/enviroment';
 
 /**
  * Creates server debug to API Service
  */
+
+// dotenv.config({ path: env() });
+
 
 const serverDebug = debug('reportIt:api');
 
@@ -94,7 +101,7 @@ function onListening() {
  */
 
 db().then(() => {
-  serverDebug(`Connected to ${process.env.DB_NAME}`);
+  serverDebug(`Connected to ${env.DB_NAME}`);
   server.listen(port);
   server.on('error', onError);
   server.on('listening', onListening);

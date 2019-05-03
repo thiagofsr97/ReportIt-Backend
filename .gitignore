@@ -28,3 +28,8 @@ node_modules
 
 # Debug log from npm
 npm-debug.log
+
+#env files
+config/enviroments/.env.dev
+config/enviroments/.env.production
+

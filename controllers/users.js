@@ -94,6 +94,17 @@ const create = async function (req, res, next) {
       registrationNumber,
     });
 
+    // if (req.file !== undefined) {
+    //   console.log(req.file);
+    //   user.set('profile.file', req.file.path);
+    // }
+
+    if (req.file !== undefined) {
+      user.picture = {};
+      user.picture.url = req.file.url;
+      user.picture.id = req.file.public_id;
+    }
+
     const userCreated = await user.save();
     result.result = userCreated;
     res.status(200).send({ result });
@@ -172,6 +183,17 @@ const logout = async function (req, res, next) {
   }
 };
 
+const deleteAll = async function (req, res, next) {
+  try {
+    const result = {};
+    await User.deleteMany({});
+    result.result = 'All users have been deleted from Database. Wow, you\'re crazy!';
+    res.status(200).send(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export {
-  authenticate, getAll, getById, create, update, exclude, logout,
+  authenticate, getAll, getById, create, update, exclude, logout, deleteAll,
 };

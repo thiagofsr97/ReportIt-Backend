@@ -12,7 +12,6 @@
 
 import express from 'express';
 import createError from 'http-errors';
-import dotenv from 'dotenv';
 import logger from 'morgan';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -20,13 +19,11 @@ import helmet from 'helmet';
 import env from './config/enviroments/enviroment';
 import usersRoute from './routes/users';
 
-dotenv.config({ path: env() });
-
 const app = express();
 
 app.use(helmet());
 app.use(cors());
-app.use(logger(process.env.LOGGER_FORMAT));
+app.use(logger(`${env.LOGGER_FORMAT}`));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

@@ -1,13 +1,12 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import thumbnailPluginLib from 'mongoose-thumbnail';
-import path from 'path';
+// import thumbnailPluginLib from 'mongoose-thumbnail';
+// import path from 'path';
 
-const { thumbnailPlugin, make_upload_to_model } = thumbnailPluginLib;
-
-const uploadsBase = path.join(__dirname, `${process.env.PATH_UPLOAD}`);
-const uploads = path.join(uploadsBase, 'u');
-
+// const { thumbnailPlugin, make_upload_to_model } = thumbnailPluginLib;
+// const uploads_base = path.join('/', 'uploads_dev');
+// const uploads = path.join(uploads_base, 'u');
+import env from '../config/enviroments/enviroment';
 
 const userSchema = new mongoose.Schema({
   access: { type: String, required: false, default: 'standard' },
@@ -18,19 +17,16 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true, trim: true },
   dateBirth: { type: Date, required: true },
   registrationNumber: { type: String, required: true },
+  picture: { url: String, id: String },
 }, { timestamps: true, versionKey: false });
 
 userSchema.set('toJSON', { virtuals: true });
 
-userSchema.plugin(thumbnailPlugin, {
-  name: 'profilePicture',
-  format: 'png',
-  size: 80,
-  inline: true,
-  save: true,
-  // upload_to: make_upload_to_model(uploads, 'profiles'),
-  // relative_to: uploadsBase,
-});
+// userSchema.plugin(thumbnailPlugin, {
+//   name: 'profile',
+//   inline: true,
+//   save: true,
+// });
 
 // encrypt password before save
 userSchema.pre('save', function (next) {
@@ -39,7 +35,7 @@ userSchema.pre('save', function (next) {
   if (!user.isModified()) { // don't rehash if it's an old user
     next();
   } else {
-    bcrypt.hash(user.password, parseInt(`${process.env.SALTING_ROUNDS}`, 10), (err, hash) => {
+    bcrypt.hash(user.password, parseInt(`${env.SALTING_ROUNDS}`, 10), (err, hash) => {
       if (err) {
         console.log('Error hashing password for user', user.name);
         next(err);

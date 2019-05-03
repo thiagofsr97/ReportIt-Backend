@@ -1,3 +1,4 @@
+import dotenv from 'dotenv';
 import path from 'path';
 
 const env = function enviroment() {
@@ -10,4 +11,7 @@ const env = function enviroment() {
   return path.join(__dirname, '.env.production');
 };
 
-export default env;
+const envVariables = dotenv.config({ path: env() });
+
+
+export default envVariables.parsed;

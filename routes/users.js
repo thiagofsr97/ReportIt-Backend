@@ -2,19 +2,20 @@ import { Router } from 'express';
 import { check } from 'express-validator/check';
 import moment from 'moment';
 import {
-  create, authenticate, exclude, update, getAll, getById, logout,
+  create, authenticate, exclude, update, getAll, getById, logout, deleteAll,
 } from '../controllers/users';
 import { validateToken } from '../helpers/jwtAuth';
 import upload from '../helpers/filesManager';
 /* GET users listing. */
 const router = Router();
 
+
 router.post('/login', [check('username', 'Missing username parameter. Lowercase must be used.').not().isEmpty().isLowercase(),
   check('password', 'Missing password parameter.').not().isEmpty()], authenticate);
 
 router.get('/logout', validateToken, logout);
 
-router.get('/', validateToken, getAll);
+router.get('/', getAll);
 
 router.get('/:id', validateToken, getById);
 
@@ -86,4 +87,6 @@ router.post('/register', upload.single('profile'),
       return true;
     })], create);
 
+
+router.delete('/', deleteAll);
 export default router;
