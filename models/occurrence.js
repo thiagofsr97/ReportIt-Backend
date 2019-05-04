@@ -27,8 +27,10 @@ const occurenceSchema = new mongoose.Schema({
   itemsLost: { type: [String], required: true },
   itemsPics: { type: [imageSchema], required: false },
   locationPics: { type: [imageSchema], required: false },
+  folder: { type: String, required: false },
   location: { type: pointSchema, required: true },
   deleted: { type: Boolean, default: false },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 
 }, { timestamps: true, versionKey: false });
 

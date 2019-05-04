@@ -1,6 +1,7 @@
 import { validationResult } from 'express-validator/check';
 import createError from 'http-errors';
 import bcrypt from 'bcrypt';
+import { Error as errMongo } from 'mongoose';
 import { validateToken, destroyJwt, signIn } from '../helpers/jwtAuth';
 import User from '../models/user';
 
@@ -29,6 +30,7 @@ const authenticate = async function (req, res, next) {
 
       result.token = token;
       result.result = user;
+      result.message = 'User has been successfully authenticated.';
       res.status(200).send(result);
     } else {
       return next(createError(401, 'Authentication Error.'));
@@ -44,6 +46,7 @@ const getAll = async function (req, res, next) {
     const users = await User.find({ deleted: false }).select('-password').exec();
     if (users) {
       result.result = users;
+      result.message = 'Users have been successfully found.';
       res.status(200).send(result);
     } else {
       return next(createError(404, 'There are not users in the DB.'));
@@ -65,6 +68,9 @@ const getById = async function (req, res, next) {
       return next(createError(404, 'User not found.'));
     }
   } catch (err) {
+    if (err instanceof errMongo.CastError) {
+      return next(createError(404, 'User not found \'cause id is not processable.'));
+    }
     next(err);
   }
 };
@@ -88,19 +94,16 @@ const create = async function (req, res, next) {
       name,
       username,
       password,
-      dateBirth: new Date(dateBirth),
+      dateBirth,
       registrationNumber,
     });
 
-    // if (req.file !== undefined) {
-    //   console.log(req.file);
-    //   user.set('profile.file', req.file.path);
-    // }
-
-    if (req.file !== undefined) {
-      user.picture = {};
-      user.picture.url = req.file.url;
-      user.picture.id = req.file.public_id;
+    if (req.file) {
+      user.picture = {
+        url: req.file.url,
+        id: req.file.public_id,
+        folder: req.file.destination,
+      };
     }
 
     const userCreated = await user.save();
@@ -120,25 +123,17 @@ const update = async function (req, res, next) {
   try {
     const result = {};
     const { id } = req.params;
-    const updateObj = {};
+
 
     const user = await User.findById(id);
     if (!user) {
       return next(createError(404, 'User not found.'));
     }
 
-
-    Object.keys(user._doc).forEach((key) => {
-      if (key !== '_id' && req.body[key] !== undefined) {
-        updateObj[key] = req.body[key];
-      }
-    });
-    if (updateObj.dateBirth !== undefined) {
-      updateObj.dateBirth = new Date(updateObj.dateBirth);
-    }
-
-    const { username } = updateObj;
-    if (username !== undefined) {
+    const {
+ name, username, password, dateBirth, registrationNumber 
+} = req.body;
+    if (username) {
       const exists = await User.findOne({ username });
 
       if (exists && (exists._id !== id)) {
@@ -146,12 +141,32 @@ const update = async function (req, res, next) {
       }
     }
 
-    Object.assign(user, updateObj);
+    const args = {
+      ...(name && { name }),
+      ...(username && { username }),
+      ...(password && { password }),
+      ...(dateBirth && { dateBirth }),
+      ...(registrationNumber && { registrationNumber }),
+    };
+
+    Object.assign(user, args);
+
+    if (req.file) {
+      user.picture = {
+        url: req.file.url,
+        id: req.file.public_id,
+        folder: req.file.destination,
+      };
+    }
+
     const userSaved = await user.save();
-    destroyJwt(id);
     result.result = userSaved;
+    result.message = 'User has been successfully updated.';
     res.status(200).send(result);
   } catch (err) {
+    if (err instanceof errMongo.CastError) {
+      return next(createError(404, 'User not updated \'cause id is not processable.'));
+    }
     next(err);
   }
 };

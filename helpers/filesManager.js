@@ -6,7 +6,10 @@ import uid from 'uuid/v4';
 // import path from 'path';
 import cloudinary from 'cloudinary';
 import cloudinaryStorage from 'multer-storage-cloudinary';
+import { Error as errMongo } from 'mongoose';
 import env from '../config/enviroments/enviroment';
+import Occurrence from '../models/occurrence';
+import User from '../models/user';
 
 cloudinary.config({
   cloud_name: `${env.CLOUD_NAME}`,
@@ -16,7 +19,20 @@ cloudinary.config({
 
 const storage = cloudinaryStorage({
   cloudinary,
-  folder: `reportIt/occurences/${uid()}`,
+  async folder(req, file, cb) {
+    const { id } = req.params;
+    let occurenceFolder;
+    if (id) {
+      occurenceFolder = await Occurrence.findById(id, 'folder');
+      console.log(occurenceFolder);
+      occurenceFolder = occurenceFolder.folder;
+    }
+    if (occurenceFolder) {
+      cb(null, occurenceFolder);
+    } else {
+      cb(null, `reportIt/occurrences/${uid()}`);
+    }
+  },
   allowedFormats: ['jpg', 'png'],
   transformation: [{
     width: 500, height: 500, crop: 'limit', fetch_format: 'auto', quality: 'auto',
@@ -25,8 +41,22 @@ const storage = cloudinaryStorage({
 
 const profileStorage = cloudinaryStorage({
   cloudinary,
-  folder(req, file, cb) {
-    cb(null, `reportIt/profile/${uid()}`);
+  async folder(req, file, cb) {
+    const { id } = req.params;
+    if (id) {
+      let profileFolder;
+      try {
+        profileFolder = await User.findById(id, 'folder');
+      } catch (err) {
+        if (err instanceof errMongo.CastError) {
+          cb(null, `reportIt/profile/${uid()}`);
+          return;
+        }
+      }
+      cb(null, profileFolder.folder);
+    } else {
+      cb(null, `reportIt/profile/${uid()}`);
+    }
   },
   allowedFormats: ['jpg', 'png'],
   transformation: [{
