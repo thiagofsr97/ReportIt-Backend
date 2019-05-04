@@ -19,8 +19,6 @@ const authenticate = async function (req, res, next) {
     if (!user) {
       return next(createError(404), 'User not found.');
     }
-
-    console.log(user);
     const match = await bcrypt.compare(password, user.password);
     if (match) {
       const payload = {
@@ -43,12 +41,12 @@ const authenticate = async function (req, res, next) {
 const getAll = async function (req, res, next) {
   try {
     const result = {};
-    const users = await User.find({}).select('-password').exec();
+    const users = await User.find({ deleted: false }).select('-password').exec();
     if (users) {
       result.result = users;
       res.status(200).send(result);
     } else {
-      return next(createError(404, 'Users not found.'));
+      return next(createError(404, 'There are not users in the DB.'));
     }
   } catch (err) {
     next(err);
@@ -107,7 +105,7 @@ const create = async function (req, res, next) {
 
     const userCreated = await user.save();
     result.result = userCreated;
-    res.status(200).send({ result });
+    res.status(200).send(result);
   } catch (err) {
     next(err);
   }
@@ -162,8 +160,9 @@ const exclude = async function (req, res, next) {
   try {
     const result = {};
     const { id } = req.params;
-    const userDeleted = await User.findByIdAndRemove(id);
+    const userDeleted = await User.findByIdAndUpdate(id, { deleted: true });
     result.result = userDeleted;
+    result.message = 'User has been deleted sucessfully.';
     res.status(200).send(result);
   } catch (err) {
     next(err);

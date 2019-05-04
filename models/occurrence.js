@@ -10,12 +10,13 @@ const pointSchema = new mongoose.Schema({
     type: [Number],
     required: true,
   },
-});
+}, { _id: false });
 
 const imageSchema = new mongoose.Schema({
   url: { type: String, required: true },
+  secureUrl: { type: String, required: true },
   id: { type: String, required: true },
-});
+}, { _id: false });
 
 // const denver = { type: 'Point', coordinates: [-104.9903, 39.7392] };
 
@@ -24,6 +25,16 @@ const occurenceSchema = new mongoose.Schema({
   date: { type: Date, required: true },
   type: { type: String, enum: ['assault', 'robbery'] },
   itemsLost: { type: [String], required: true },
+  itemsPics: { type: [imageSchema], required: false },
+  locationPics: { type: [imageSchema], required: false },
   location: { type: pointSchema, required: true },
+  deleted: { type: Boolean, default: false },
 
-}, { versionKey: false });
+}, { timestamps: true, versionKey: false });
+
+occurenceSchema.set('toJSON', { virtuals: true });
+occurenceSchema.index({ location: '2dsphere' });
+
+const Occurence = mongoose.model('Occurence', occurenceSchema);
+
+export default Occurence;

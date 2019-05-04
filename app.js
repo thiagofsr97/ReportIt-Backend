@@ -18,6 +18,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import env from './config/enviroments/enviroment';
 import usersRoute from './routes/users';
+import occurrenceRoute from './routes/occurrences';
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use(cookieParser());
  */
 
 app.use('/users', usersRoute);
+app.use('/occurrences', occurrenceRoute);
 
 /**
   * Used when next is called with no parameters

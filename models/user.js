@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
   dateBirth: { type: Date, required: true },
   registrationNumber: { type: String, required: true },
   picture: { url: String, id: String },
+  deleted: { type: Boolean, default: false },
 }, { timestamps: true, versionKey: false });
 
 userSchema.set('toJSON', { virtuals: true });
@@ -32,7 +33,7 @@ userSchema.set('toJSON', { virtuals: true });
 userSchema.pre('save', function (next) {
   const user = this;
   console.log(user.isModified());
-  if (!user.isModified()) { // don't rehash if it's an old user
+  if (!user.isModified()) {
     next();
   } else {
     bcrypt.hash(user.password, parseInt(`${env.SALTING_ROUNDS}`, 10), (err, hash) => {

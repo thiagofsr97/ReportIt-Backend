@@ -1,4 +1,5 @@
 import multer from 'multer';
+import uid from 'uuid/v4';
 // import {
 //   moveSync, ensureDirSync, pathExistsSync, removeSync,
 // } from 'fs-extra';
@@ -15,12 +16,25 @@ cloudinary.config({
 
 const storage = cloudinaryStorage({
   cloudinary,
-  folder: 'reportIt',
+  folder: `reportIt/occurences/${uid()}`,
   allowedFormats: ['jpg', 'png'],
-  transformation: [{ width: 500, height: 500, crop: 'limit' }],
+  transformation: [{
+    width: 500, height: 500, crop: 'limit', fetch_format: 'auto', quality: 'auto',
+  }],
 });
 
+const profileStorage = cloudinaryStorage({
+  cloudinary,
+  folder(req, file, cb) {
+    cb(null, `reportIt/profile/${uid()}`);
+  },
+  allowedFormats: ['jpg', 'png'],
+  transformation: [{
+    width: 90, height: 90, crop: 'thumb', gravity: 'face', quality: 'auto', fetch_format: 'auto',
+  }],
+});
 const upload = multer({ storage });
+const uploadProfile = multer({ profileStorage });
 
 
 // const storage = multer.diskStorage({
@@ -39,4 +53,4 @@ const upload = multer({ storage });
 // });
 
 
-export default upload;
+export { upload, uploadProfile };
