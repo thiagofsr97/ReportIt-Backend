@@ -30,6 +30,6 @@ node_modules
 npm-debug.log
 
 #env files
-config/enviroments/.env.dev
-config/enviroments/.env.production
+src/config/enviroments/.env.dev
+src/config/enviroments/.env.production
 
