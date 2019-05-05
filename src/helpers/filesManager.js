@@ -17,9 +17,9 @@ cloudinary.config({
   api_secret: `${env.API_SECRET}`,
 });
 
-const storage = cloudinaryStorage({
+const profileStorage = cloudinaryStorage({
   cloudinary,
-  async folder(req, file, cb) {
+  folder: async (req, file, cb) => {
     const { id } = req.params;
     let occurenceFolder;
     if (id) {
@@ -39,32 +39,58 @@ const storage = cloudinaryStorage({
   }],
 });
 
-const profileStorage = cloudinaryStorage({
+const storage = cloudinaryStorage({
   cloudinary,
-  async folder(req, file, cb) {
+  folder: async (req, file, cb) => {
     const { id } = req.params;
+    let occurenceFolder;
     if (id) {
-      let profileFolder;
-      try {
-        profileFolder = await User.findById(id, 'folder');
-      } catch (err) {
-        if (err instanceof errMongo.CastError) {
-          cb(null, `reportIt/profile/${uid()}`);
-          return;
-        }
-      }
-      cb(null, profileFolder.folder);
+      occurenceFolder = await Occurrence.findById(id, 'folder');
+      console.log(occurenceFolder);
+      occurenceFolder = occurenceFolder.folder;
+    }
+    if (occurenceFolder) {
+      cb(null, occurenceFolder);
     } else {
-      cb(null, `reportIt/profile/${uid()}`);
+      cb(null, `reportIt/occurrences/${uid()}`);
     }
   },
   allowedFormats: ['jpg', 'png'],
   transformation: [{
-    width: 90, height: 90, crop: 'thumb', gravity: 'face', quality: 'auto', fetch_format: 'auto',
+    width: 500, height: 500, crop: 'limit', fetch_format: 'auto', quality: 'auto',
   }],
 });
+
+// const profileStorage = cloudinaryStorage({
+//   cloudinary,
+//   // eslint-disable-next-line object-shorthand
+//   folder: function (req, file, cb) {
+//     console.log('to akkkeeee');
+//     const { id } = req.params;
+//     if (id) {
+//       let profileFolder;
+//       try {
+//         profileFolder =User.findById(id, 'folder');
+//       } catch (err) {
+//         if (err instanceof errMongo.CastError) {
+//           cb(null, `reportIt/profile/${uid()}`);
+//           return;
+//         }
+//       }
+//       cb(null, profileFolder.folder);
+//     } else {
+//       cb(null, `reportIt/profile/${uid()}`);
+//     }
+//   },
+//   allowedFormats: ['jpg', 'png'],
+//   transformation: [{
+//     width: 90, height: 90, gravity: 'face', quality: 'auto', fetch_format: 'auto',
+//   }],
+// });
 const upload = multer({ storage });
 const uploadProfile = multer({ profileStorage });
+
+console.log(uploadProfile);
 
 
 // const storage = multer.diskStorage({

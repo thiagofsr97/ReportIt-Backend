@@ -98,6 +98,7 @@ const create = async function (req, res, next) {
       registrationNumber,
     });
 
+
     if (req.file) {
       user.picture = {
         url: req.file.url,
@@ -131,8 +132,8 @@ const update = async function (req, res, next) {
     }
 
     const {
- name, username, password, dateBirth, registrationNumber 
-} = req.body;
+      name, username, password, dateBirth, registrationNumber,
+    } = req.body;
     if (username) {
       const exists = await User.findOne({ username });
 
