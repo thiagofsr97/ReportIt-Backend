@@ -5,7 +5,7 @@ import {
   create, authenticate, exclude, update, getAll, getById, logout, deleteAll,
 } from '../controllers/users';
 import { validateToken } from '../helpers/jwtAuth';
-import { uploadProfile as upload } from '../helpers/filesManager';
+import upload from '../helpers/filesManager';
 /* GET users listing. */
 const router = Router();
 const dateFormat = 'YYYY-MM-DD';

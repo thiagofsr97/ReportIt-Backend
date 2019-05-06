@@ -23,6 +23,7 @@ const create = async function (req, res, next) {
     });
 
     if (req.files) {
+      console.log(req.files);
       let assigned = false;
       const { itemsPics, locationPics } = req.files;
 
@@ -30,8 +31,8 @@ const create = async function (req, res, next) {
         occurrence.itemsPics = [];
         itemsPics.forEach((picture) => {
           const { url, secure_url, public_id } = picture;
-          if (!assigned) {
-            occurrence.folder = picture.destination;
+          if (!occurrence.folder && !assigned) {
+            occurrence.folder = public_id.substring(0, public_id.lastIndexOf('/'));
             assigned = true;
           }
           occurrence.itemsPics.push({
@@ -46,7 +47,7 @@ const create = async function (req, res, next) {
         occurrence.locationPics = [];
         locationPics.forEach((picture) => {
           const { url, secure_url, public_id } = picture;
-          if (!assigned) {
+          if (!occurrence.folder && !assigned) {
             occurrence.folder = picture.destination;
             assigned = true;
           }
@@ -217,7 +218,7 @@ const update = async function (req, res, next) {
         occurrence.itemsPics = [];
         itemsPics.forEach((picture) => {
           const { url, secure_url, public_id } = picture;
-          if (!assigned) {
+          if (!occurrence.folder && !assigned) {
             occurrence.folder = picture.destination;
             assigned = true;
           }
@@ -233,7 +234,7 @@ const update = async function (req, res, next) {
         occurrence.locationPics = [];
         locationPics.forEach((picture) => {
           const { url, secure_url, public_id } = picture;
-          if (!assigned) {
+          if (!occurrence.folder && !assigned) {
             occurrence.folder = picture.destination;
             assigned = true;
           }

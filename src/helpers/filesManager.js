@@ -7,6 +7,7 @@ import uid from 'uuid/v4';
 import cloudinary from 'cloudinary';
 import cloudinaryStorage from 'multer-storage-cloudinary';
 import { Error as errMongo } from 'mongoose';
+import path from 'path';
 import env from '../config/enviroments/enviroment';
 import Occurrence from '../models/occurrence';
 import User from '../models/user';
@@ -17,96 +18,51 @@ cloudinary.config({
   api_secret: `${env.API_SECRET}`,
 });
 
-const profileStorage = cloudinaryStorage({
-  cloudinary,
-  folder: async (req, file, cb) => {
-    const { id } = req.params;
-    let occurenceFolder;
-    if (id) {
-      occurenceFolder = await Occurrence.findById(id, 'folder');
-      console.log(occurenceFolder);
-      occurenceFolder = occurenceFolder.folder;
-    }
-    if (occurenceFolder) {
-      cb(null, occurenceFolder);
-    } else {
-      cb(null, `reportIt/occurrences/${uid()}`);
-    }
-  },
-  allowedFormats: ['jpg', 'png'],
-  transformation: [{
-    width: 500, height: 500, crop: 'limit', fetch_format: 'auto', quality: 'auto',
-  }],
-});
 
 const storage = cloudinaryStorage({
   cloudinary,
   folder: async (req, file, cb) => {
+    const { baseUrl } = req;
+    let pathToSave = path.join('reportIt', baseUrl);
     const { id } = req.params;
-    let occurenceFolder;
-    if (id) {
-      occurenceFolder = await Occurrence.findById(id, 'folder');
-      console.log(occurenceFolder);
-      occurenceFolder = occurenceFolder.folder;
-    }
-    if (occurenceFolder) {
-      cb(null, occurenceFolder);
+    if (!id) {
+      pathToSave = path.join(pathToSave, uid());
     } else {
-      cb(null, `reportIt/occurrences/${uid()}`);
+      try {
+        let destination;
+        if (baseUrl.match(/^\/ {2}occurrences$/)) {
+          destination = await Occurrence.findById(id, 'folder');
+        } else {
+          destination = await User.findById(id, 'folder');
+        }
+        if (!destination) {
+          pathToSave = path.join(pathToSave, uid());
+        }
+        pathToSave = destination.folder;
+      } catch (err) {
+        if (err instanceof errMongo.CastError) {
+          pathToSave = path.join(pathToSave, uid());
+        }
+      }
     }
+    cb(null, pathToSave);
   },
   allowedFormats: ['jpg', 'png'],
-  transformation: [{
-    width: 500, height: 500, crop: 'limit', fetch_format: 'auto', quality: 'auto',
-  }],
+  transformation: (req, file, cb) => {
+    const { baseUrl } = req;
+
+    if (baseUrl.match(/^\/occurrences$/)) {
+      cb(null, [{
+        width: 500, height: 500, crop: 'limit', fetch_format: 'auto', quality: 'auto',
+      }]);
+    } else {
+      cb(null, [{
+        width: 90, height: 90, gravity: 'face', crop: 'thumb', fetch_format: 'auto', quality: 'auto',
+      }]);
+    }
+  },
 });
 
-// const profileStorage = cloudinaryStorage({
-//   cloudinary,
-//   // eslint-disable-next-line object-shorthand
-//   folder: function (req, file, cb) {
-//     console.log('to akkkeeee');
-//     const { id } = req.params;
-//     if (id) {
-//       let profileFolder;
-//       try {
-//         profileFolder =User.findById(id, 'folder');
-//       } catch (err) {
-//         if (err instanceof errMongo.CastError) {
-//           cb(null, `reportIt/profile/${uid()}`);
-//           return;
-//         }
-//       }
-//       cb(null, profileFolder.folder);
-//     } else {
-//       cb(null, `reportIt/profile/${uid()}`);
-//     }
-//   },
-//   allowedFormats: ['jpg', 'png'],
-//   transformation: [{
-//     width: 90, height: 90, gravity: 'face', quality: 'auto', fetch_format: 'auto',
-//   }],
-// });
 const upload = multer({ storage });
-const uploadProfile = multer({ profileStorage });
 
-console.log(uploadProfile);
-
-
-// const storage = multer.diskStorage({
-//   async destination(req, file, cb) {
-//     try {
-//       await ensureDirSync(`${process.env.PATH_UPLOAD}`);
-//       const destinationFolder = `${process.env.PATH_UPLOAD}`;
-//       cb(null, destinationFolder);
-//     } catch (err) {
-//       cb(err);
-//     }
-//   },
-//   filename(req, file, cb) {
-//     cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-//   },
-// });
-
-
-export { upload, uploadProfile };
+export default upload;

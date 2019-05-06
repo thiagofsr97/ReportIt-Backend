@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-// import thumbnailPluginLib from 'mongoose-thumbnail';
-// import path from 'path';
-
-// const { thumbnailPlugin, make_upload_to_model } = thumbnailPluginLib;
-// const uploads_base = path.join('/', 'uploads_dev');
-// const uploads = path.join(uploads_base, 'u');
 import env from '../config/enviroments/enviroment';
+
+const imageSchema = new mongoose.Schema({
+  url: { type: String, required: true },
+  secureUrl: { type: String, required: true },
+  id: { type: String, required: true },
+}, { _id: false });
 
 const userSchema = new mongoose.Schema({
   access: { type: String, required: false, default: 'standard' },
@@ -17,19 +17,13 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true, trim: true },
   dateBirth: { type: Date, required: true },
   registrationNumber: { type: String, required: true },
-  picture: { url: String, id: String },
+  picture: { type: imageSchema, required: false },
+  folder: { type: String, required: false },
   deleted: { type: Boolean, default: false },
 }, { timestamps: true, versionKey: false });
 
 userSchema.set('toJSON', { virtuals: true });
 
-// userSchema.plugin(thumbnailPlugin, {
-//   name: 'profile',
-//   inline: true,
-//   save: true,
-// });
-
-// encrypt password before save
 userSchema.pre('save', function (next) {
   const user = this;
   console.log(user.isModified());

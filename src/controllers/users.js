@@ -96,16 +96,19 @@ const create = async function (req, res, next) {
       password,
       dateBirth,
       registrationNumber,
+      ...(req.file && { folder: req.file.public_id.substring(0, req.file.public_id.lastIndexOf('/')) }),
     });
 
 
     if (req.file) {
+      const { url, public_id, secure_url } = req.file;
       user.picture = {
-        url: req.file.url,
-        id: req.file.public_id,
-        folder: req.file.destination,
+        url,
+        id: public_id,
+        secureUrl: secure_url,
       };
     }
+
 
     const userCreated = await user.save();
     result.result = userCreated;
@@ -148,15 +151,17 @@ const update = async function (req, res, next) {
       ...(password && { password }),
       ...(dateBirth && { dateBirth }),
       ...(registrationNumber && { registrationNumber }),
+      ...((req.file && !user.folder) && { folder: req.file.public_id.substring(0, req.file.public_id.lastIndexOf('/')) }),
     };
 
     Object.assign(user, args);
 
     if (req.file) {
+      const { url, public_id, secure_url } = req.file;
       user.picture = {
-        url: req.file.url,
-        id: req.file.public_id,
-        folder: req.file.destination,
+        url,
+        id: public_id,
+        secureUrl: secure_url,
       };
     }
 

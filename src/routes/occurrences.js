@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { body, query } from 'express-validator/check';
 import moment from 'moment';
 import { validateToken } from '../helpers/jwtAuth';
-import { upload } from '../helpers/filesManager';
+import upload from '../helpers/filesManager';
 import {
   create, getAll, update, getById, getByUserId,
 } from '../controllers/occurrences';
@@ -52,7 +52,7 @@ router.post('/create',
         throw new Error('The field lng in location is not numeric.');
       }
 
-      req.body.location = { type: 'Point', coordinates: [json.lat, json.lng] };
+      req.body.location = { type: 'Point', coordinates: [json.lng, json.lat] };
       return true;
     }),
     body('itemsLost', 'Missing itemsLost parameter. Parameter must be an array.').not().isEmpty().isArray(),
