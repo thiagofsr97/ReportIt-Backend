@@ -26,7 +26,6 @@ userSchema.set('toJSON', { virtuals: true });
 
 userSchema.pre('save', function (next) {
   const user = this;
-  console.log(user.isModified());
   if (!user.isModified()) {
     next();
   } else {

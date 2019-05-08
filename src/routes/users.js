@@ -8,7 +8,7 @@ import { validateToken } from '../helpers/jwtAuth';
 import upload from '../helpers/filesManager';
 /* GET users listing. */
 const router = Router();
-const dateFormat = 'YYYY-MM-DD';
+const dateFormat = 'YYYY-MM-DD HH:mm';
 
 router.post('/login', [body('username', 'Missing username parameter.').not().isEmpty(),
   body('password', 'Missing password parameter.').not().isEmpty()], authenticate);

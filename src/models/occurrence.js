@@ -29,6 +29,7 @@ const occurenceSchema = new mongoose.Schema({
   locationPics: { type: [imageSchema], required: false },
   folder: { type: String, required: false },
   location: { type: pointSchema, required: true },
+  address: { type: String, required: true },
   deleted: { type: Boolean, default: false },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 

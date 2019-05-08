@@ -11,7 +11,7 @@ const create = async function (req, res, next) {
 
   try {
     const {
-      description, date, type, location, itemsLost, id,
+      description, date, type, location, itemsLost, id, address,
     } = req.body;
     const occurrence = new Occurrence({
       description,
@@ -19,6 +19,7 @@ const create = async function (req, res, next) {
       type,
       itemsLost,
       location,
+      address,
       createdBy: id,
     });
 
@@ -197,7 +198,7 @@ const update = async function (req, res, next) {
       return next(createError(404, 'Occurrence not updated \'cause was not found with this id.'));
     }
     const {
-      description, date, type, location, itemsLost,
+      description, date, type, location, itemsLost, address,
     } = req.body;
 
     const args = {
@@ -205,6 +206,7 @@ const update = async function (req, res, next) {
       ...(date && { date }),
       ...(type && { type }),
       ...(location && { location }),
+      ...(address && { address }),
       ...(itemsLost && { itemsLost }),
     };
 

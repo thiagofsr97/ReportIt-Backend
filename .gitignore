@@ -30,8 +30,9 @@ node_modules
 npm-debug.log
 
 #env files
-src/config/enviroments/.env.dev
-src/config/enviroments/.env.production
+#src/config/enviroments/.env.dev
+#src/config/enviroments/.env.production
 
-
+#build
+dist
 

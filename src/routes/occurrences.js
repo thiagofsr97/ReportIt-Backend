@@ -8,7 +8,7 @@ import {
 } from '../controllers/occurrences';
 
 const router = Router();
-const dateFormat = 'YYYY-MM-DD';
+const dateFormat = 'YYYY-MM-DD HH:mm';
 
 router.post('/create',
   upload.fields([{ name: 'itemsPics', maxCount: 5 }, { name: 'locationPics', maxCount: 5 }]),
@@ -19,7 +19,6 @@ router.post('/create',
       if (date === undefined) {
         throw new Error('Missing date parameter.');
       }
-
 
       const parser = moment(date, dateFormat, true);
       if (!parser.isValid()) {
@@ -55,6 +54,7 @@ router.post('/create',
       req.body.location = { type: 'Point', coordinates: [json.lng, json.lat] };
       return true;
     }),
+    body('address', 'Missing address parameter. Parameter must be a string.').not().isEmpty().isString(),
     body('itemsLost', 'Missing itemsLost parameter. Parameter must be an array.').not().isEmpty().isArray(),
   ],
   create);
@@ -119,6 +119,7 @@ router.put('/:id', [
     req.body.location = { type: 'Point', coordinates: [json.lat, json.lng] };
     return true;
   }),
+  body('address', 'Parameter must be a string.').optional().isString(),
   body('itemsLost', 'Body itemsLost parameter must be an array.').optional().isArray(),
 ], update);
 
