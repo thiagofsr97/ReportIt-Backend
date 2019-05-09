@@ -128,8 +128,8 @@ const getAll = async function (req, res, next) {
 
       dateQuery = {
         date: {
-          $gte: start,
-          $lte: end,
+          $gte: start.toDate(),
+          $lte: end.toDate(),
         },
       };
     }

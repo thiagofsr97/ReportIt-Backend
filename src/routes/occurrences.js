@@ -67,7 +67,7 @@ router.get('/', [
     if (!start.isValid()) {
       throw new Error('Query date_start parameter is not following the format YYYY-MM-DD.');
     }
-    req.query.date_start = start.toDate();
+    req.query.date_start = start;
     return true;
   }),
   query('date_end').optional().custom((date, { req }) => {
@@ -75,7 +75,7 @@ router.get('/', [
     if (!end.isValid()) {
       throw new Error('Query date_end parameter is not following the format YYYY-MM-DD.');
     }
-    req.query.date_end = end.toDate();
+    req.query.date_end = end;
     return true;
   }),
   query('long', 'Query long parameter must be numeric.').optional().isNumeric(),

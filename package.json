@@ -3,10 +3,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "DEBUG=reportIt:* NODE_ENV=production babel-node src/bin/index",
-    "dev": "nodemon --exec DEBUG=reportIt:* NODE_ENV=dev babel-node src/bin/index  ",
-    "build": "DEBUG=reportIt:* NODE_ENV=dev babel src --out-dir dist --copy-files --include-dotfiles --reset-cache",
-    "serve": "node dist/bin/index.js "
+    "start": "cross-env DEBUG=reportIt:* NODE_ENV=production babel-node src/bin/index",
+    "dev": "cross-env nodemon --exec DEBUG=reportIt:* NODE_ENV=dev babel-node src/bin/index  ",
+    "build": "cross-env DEBUG=reportIt:* NODE_ENV=dev babel src --out-dir dist --copy-files --include-dotfiles --reset-cache",
+    "serve": "cross-env node dist/bin/index.js "
   },
   "dependencies": {
     "@babel/cli": "^7.4.4",
@@ -20,6 +20,7 @@
     "cloudinary": "^1.14.0",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.5",
+    "cross-env": "^5.2.0",
     "debug": "~2.6.9",
     "dotenv": "^7.0.0",
     "express": "~4.16.0",
