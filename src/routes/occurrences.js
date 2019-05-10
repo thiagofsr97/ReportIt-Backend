@@ -55,7 +55,7 @@ router.post('/create',
       return true;
     }),
     body('address', 'Missing address parameter. Parameter must be a string.').not().isEmpty().isString(),
-    body('itemsLost', 'Missing itemsLost parameter. Parameter must be an array.').not().isEmpty().isArray(),
+    body('itemsLost', 'Missing itemsLost parameter.').not().isEmpty(),
   ],
   create);
 
@@ -120,7 +120,7 @@ router.put('/:id', [
     return true;
   }),
   body('address', 'Parameter must be a string.').optional().isString(),
-  body('itemsLost', 'Body itemsLost parameter must be an array.').optional().isArray(),
+  body('itemsLost', 'Body itemsLost parameter must be an array.').optional(),
 ], update);
 
 export default router;

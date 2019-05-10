@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "cross-env DEBUG=reportIt:* NODE_ENV=production babel-node src/bin/index",
-    "dev": "cross-env nodemon --exec DEBUG=reportIt:* NODE_ENV=dev babel-node src/bin/index  ",
+    "dev": " nodemon --exec DEBUG=reportIt:* NODE_ENV=dev babel-node src/bin/index  ",
     "build": "cross-env DEBUG=reportIt:* NODE_ENV=dev babel src --out-dir dist --copy-files --include-dotfiles --reset-cache",
     "serve": "cross-env node dist/bin/index.js "
   },

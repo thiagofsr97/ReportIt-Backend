@@ -26,7 +26,7 @@ app.use(helmet());
 app.use(cors());
 app.use(logger(`${env.LOGGER_FORMAT}`));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended:true}));
 app.use(cookieParser());
 
 

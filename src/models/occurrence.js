@@ -24,7 +24,7 @@ const occurenceSchema = new mongoose.Schema({
   description: { type: String, required: true },
   date: { type: Date, required: true },
   type: { type: String, enum: ['assault', 'robbery'] },
-  itemsLost: { type: [String], required: true },
+  itemsLost: { type: String, required: true },
   itemsPics: { type: [imageSchema], required: false },
   locationPics: { type: [imageSchema], required: false },
   folder: { type: String, required: false },
